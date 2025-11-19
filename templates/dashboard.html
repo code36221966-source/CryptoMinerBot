@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Miner Dashboard</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        body {
+            background-color: #000000;
+            color: #ffffff;
+            font-family: 'Segoe UI', sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+        }
+
+        /* HEADER */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        .user-info {
+            text-align: left;
+            font-size: 14px;
+            color: #888;
+        }
+        .user-name {
+            color: white;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        /* BALANCE CARDS */
+        .card-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+        .card {
+            background: #1e1e1e;
+            border: 1px solid #333;
+            border-radius: 15px;
+            padding: 15px;
+            flex: 1;
+        }
+        .card-label {
+            font-size: 12px;
+            color: #aaa;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .card-value {
+            font-size: 24px;
+            font-weight: bold;
+            margin-top: 5px;
+        }
+        .green { color: #4caf50; } /* Mining Balance Color */
+        .gold { color: #F7931A; }  /* Crypto Balance Color */
+
+        /* MINING AREA */
+        .mining-area {
+            margin: 40px 0;
+            position: relative;
+        }
+        .coin-btn {
+            background: none;
+            border: none;
+            font-size: 100px;
+            cursor: pointer;
+            transition: transform 0.1s;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .coin-btn:active {
+            transform: scale(0.90);
+        }
+        .tap-hint {
+            color: #555;
+            margin-top: 10px;
+            font-size: 14px;
+            animation: pulse 2s infinite;
+        }
+
+        /* LOGOUT BUTTON */
+        .btn-logout {
+            background: #333;
+            color: #ff4444;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 30px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 30px;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.5; }
+            50% { opacity: 1; }
+            100% { opacity: 0.5; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- HEADER: User Info -->
+    <div class="header">
+        <div class="user-info">
+            Welcome back,<br>
+            <span class="user-name" id="display-name">Loading...</span>
+        </div>
+        <div style="font-size: 24px;">⛏️</div>
+    </div>
+
+    <!-- BALANCE CARDS -->
+    <div class="card-container">
+        <!-- MINING BALANCE -->
+        <div class="card">
+            <div class="card-label">Mining</div>
+            <div class="card-value green" id="mining-bal">0.0000</div>
+        </div>
+        
+        <!-- CRYPTO BALANCE -->
+        <div class="card">
+            <div class="card-label">Wallet</div>
+            <div class="card-value gold" id="crypto-bal">0.00</div>
+        </div>
+    </div>
+
+    <!-- MINING ACTION -->
+    <div class="mining-area">
+        <button class="coin-btn" onclick="mineCoin()">🟡</button>
+        <p class="tap-hint">Tap coin to mine</p>
+    </div>
+
+    <!-- FOOTER -->
+    <button class="btn-logout" onclick="doLogout()">Log Out</button>
+
+    <script>
+        window.Telegram.WebApp.expand();
+        let user = null;
+
+        // 1. CHECK LOGIN STATUS ON LOAD
+        function init() {
+            const storedUser = localStorage.getItem('miner_user');
+            if (!storedUser) {
+                // If no user is saved, go back to Login
+                window.location.href = '/login';
+                return;
+            }
+            user = JSON.parse(storedUser);
+            
+            // Update UI
+            document.getElementById('display-name').innerText = user.username;
+            document.getElementById('mining-bal').innerText = user.mining_balance.toFixed(4);
+            document.getElementById('crypto-bal').innerText = user.crypto_balance.toFixed(2);
+        }
+
+        // 2. MINING FUNCTION (Frontend Only for now)
+        function mineCoin() {
+            // Visual update immediately (Feels fast)
+            user.mining_balance += 0.001;
+            document.getElementById('mining-bal').innerText = user.mining_balance.toFixed(4);
+            
+            // TODO: We will connect this to the Backend API in the next step
+        }
+
+        // 3. LOGOUT FUNCTION
+        function doLogout() {
+            localStorage.removeItem('miner_user');
+            window.location.href = '/login';
+        }
+
+        // Run initialization
+        init();
+    </script>
+</body>
+</html>

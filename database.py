@@ -10,14 +10,18 @@ def get_connection():
     return conn
 
 def init_db():
+    """Creates the table with the NEW Profile Fields"""
     conn = get_connection()
     c = conn.cursor()
-    # Create table with Mining Balance AND Crypto Balance
     c.execute('''
         CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             username TEXT UNIQUE NOT NULL,
             email TEXT NOT NULL,
+            first_name TEXT,
+            last_name TEXT,
+            country TEXT,
+            phone TEXT,
             password_hash TEXT NOT NULL,
             mining_balance REAL DEFAULT 0.00,
             crypto_balance REAL DEFAULT 0.00,
@@ -26,37 +30,44 @@ def init_db():
     ''')
     conn.commit()
     conn.close()
-    print("✅ Database initialized!")
+    print("✅ Database Schema Initialized!")
 
 def hash_pass(password):
-    # Encrypt password so hackers can't read it
     return hashlib.sha256(password.encode()).hexdigest()
 
-def add_user(username, email, password):
+def add_user(username, email, first_name, last_name, country, phone, password):
     conn = get_connection()
     c = conn.cursor()
     try:
-        c.execute("INSERT INTO users (username, email, password_hash, created_at) VALUES (?, ?, ?, ?)", 
-                  (username, email, hash_pass(password), time.time()))
+        # Insert all profile fields
+        c.execute('''
+            INSERT INTO users 
+            (username, email, first_name, last_name, country, phone, password_hash, created_at) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        ''', (username, email, first_name, last_name, country, phone, hash_pass(password), time.time()))
         conn.commit()
         return True, "Registration Successful!"
     except sqlite3.IntegrityError:
-        return False, "Username already exists!"
+        return False, "Username or Email already exists!"
     except Exception as e:
         return False, str(e)
     finally:
         conn.close()
 
-def verify_user(username, password):
+def verify_user(email, password):
+    """Checks EMAIL and PASSWORD for login"""
     conn = get_connection()
     c = conn.cursor()
-    c.execute("SELECT * FROM users WHERE username=? AND password_hash=?", (username, hash_pass(password)))
+    
+    # Look for the user by EMAIL, not username
+    c.execute("SELECT * FROM users WHERE email=? AND password_hash=?", (email, hash_pass(password)))
     user = c.fetchone()
     conn.close()
+    
     if user:
         return dict(user)
     return None
 
-# This runs if you execute the file directly to test it
+# Run this if file is executed directly
 if __name__ == "__main__":
     init_db()

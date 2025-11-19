@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - CryptoMiner</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        body {
+            background-color: #000000;
+            color: #ffffff;
+            font-family: 'Segoe UI', sans-serif;
+            text-align: center;
+            padding: 20px;
+            margin: 0;
+        }
+        h1 { margin-bottom: 20px; }
+        
+        /* Scrollable area for the long form */
+        .form-container {
+            max-height: 80vh;
+            overflow-y: auto;
+            padding-bottom: 50px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 12px;
+            background: #1e1e1e;
+            border: 1px solid #333;
+            color: white;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+
+        button {
+            width: 100%;
+            padding: 16px;
+            margin-top: 10px;
+            font-size: 18px;
+            font-weight: bold;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            background-color: #F7931A; /* Orange */
+            color: white;
+        }
+        button:active { opacity: 0.8; }
+
+        .back-link {
+            display: block;
+            margin-top: 20px;
+            color: #888;
+            text-decoration: none;
+            font-size: 14px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>📝 Create Account</h1>
+
+    <div class="form-container">
+        <input type="text" id="fname" placeholder="First Name">
+        <input type="text" id="lname" placeholder="Last Name">
+        <input type="text" id="username" placeholder="Username (Required)">
+        <input type="email" id="email" placeholder="Email (Required)">
+        
+        <select id="country">
+            <option value="">Select Country</option>
+            <option value="Nigeria">Nigeria</option>
+            <option value="USA">USA</option>
+            <option value="UK">UK</option>
+            <option value="India">India</option>
+            <option value="Other">Other</option>
+        </select>
+
+        <input type="tel" id="phone" placeholder="Phone Number">
+        <input type="password" id="pass" placeholder="Password">
+        <input type="password" id="confirm" placeholder="Confirm Password">
+
+        <button onclick="registerUser()">Sign Up</button>
+        
+        <!-- Link back to Home Page -->
+        <a class="back-link" href="/">⬅️ Back to Home</a>
+    </div>
+
+    <script>
+        window.Telegram.WebApp.expand();
+
+        async function registerUser() {
+            const username = document.getElementById('username').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('pass').value;
+            const confirm = document.getElementById('confirm').value;
+            
+            // Basic Validation
+            if(!username || !email || !password) {
+                return alert("Please fill in the required fields.");
+            }
+            if(password !== confirm) {
+                return alert("Passwords do not match!");
+            }
+
+            // Send data to Server
+            try {
+                const res = await fetch('/api/register', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        username: username,
+                        email: email,
+                        password: password,
+                        first_name: document.getElementById('fname').value,
+                        last_name: document.getElementById('lname').value,
+                        country: document.getElementById('country').value,
+                        phone: document.getElementById('phone').value
+                    })
+                });
+                
+                const data = await res.json();
+                alert(data.message);
+
+                if(data.success) {
+                    // Redirect to Login Page on success
+                    window.location.href = "/login";
+                }
+            } catch(error) {
+                alert("Error connecting to server.");
+            }
+        }
+    </script>
+
+</body>
+</html>
