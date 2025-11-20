@@ -6,8 +6,8 @@ TOKEN = "8516809481:AAHh7Iv34zy1Iql_h_khrr8AzxTPvC0Uc4Q"
 
 bot = telebot.TeleBot(TOKEN)
 
-# 🔴 YOUR LIVE APP URL (From the tunnel)
-APP_URL = "https://c2f0d31be8a98e.lhr.life" 
+# 🔴 YOUR LIVE APP URL (Updated)
+APP_URL = "https://6e311585307199.lhr.life" 
 
 @bot.message_handler(commands=['start'])
 def send_welcome(message):
@@ -28,4 +28,4 @@ def send_welcome(message):
     bot.send_message(message.chat.id, text, reply_markup=markup, parse_mode="Markdown")
 
 print("🤖 Bot is running...")
-bot.infinity_polling()	
+bot.infinity_polling()

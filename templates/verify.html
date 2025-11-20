@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verify Account</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        body {
+            background-color: #000000;
+            color: #ffffff;
+            font-family: 'Segoe UI', sans-serif;
+            text-align: center;
+            padding: 20px;
+        }
+        .logo { font-size: 80px; margin-top: 30px; display: block; }
+        h1 { margin: 10px 0; font-size: 24px; }
+        p { color: #888; margin-bottom: 30px; font-size: 14px;}
+
+        input {
+            width: 100%;
+            padding: 15px;
+            margin: 10px 0;
+            background-color: #222;
+            border: 1px solid #444;
+            color: white;
+            border-radius: 12px;
+            box-sizing: border-box;
+            font-size: 24px;
+            text-align: center;
+            letter-spacing: 10px;
+        }
+
+        button {
+            width: 100%;
+            padding: 18px;
+            margin: 10px 0;
+            font-size: 18px;
+            font-weight: bold;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+        }
+        .btn-orange { background-color: #F7931A; color: white; }
+    </style>
+</head>
+<body>
+
+    <span class="logo">🔐</span>
+    <h1>Verification</h1>
+    <p>Enter the 6-digit code sent to your email.</p>
+
+    <input type="number" id="code" placeholder="000000">
+    <button class="btn-orange" onclick="verifyCode()">Verify Account</button>
+
+    <script>
+        window.Telegram.WebApp.expand();
+
+        async function verifyCode() {
+            const code = document.getElementById('code').value;
+            // We retrieve the email stored during registration
+            const email = localStorage.getItem('reg_email');
+
+            if (!email) {
+                alert("Session expired. Please register again.");
+                window.location.href = '/register';
+                return;
+            }
+
+            if (code.length < 6) {
+                alert("Please enter the full 6-digit code.");
+                return;
+            }
+
+            const response = await fetch('/api/verify_code', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: email, code: code })
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                alert("✅ Verified! Please Login.");
+                window.location.href = '/login';
+            } else {
+                alert("❌ " + result.message);
+            }
+        }
+    </script>
+</body>
+</html>

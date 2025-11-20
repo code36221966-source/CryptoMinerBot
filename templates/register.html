@@ -125,8 +125,11 @@
                 alert(data.message);
 
                 if(data.success) {
-                    // Redirect to Login Page on success
-                    window.location.href = "/login";
+                    // 1. Save email for the next step
+                    localStorage.setItem('reg_email', email);
+                    
+                    // 2. Redirect to Verify Page instead of Login
+                    window.location.href = "/verify";
                 }
             } catch(error) {
                 alert("Error connecting to server.");
